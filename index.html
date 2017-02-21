@@ -27,6 +27,7 @@
 			// controls variables
 			// var controls;
 			// var mouse = {x: 0, y: 0};
+			var myObject2, myMaterial2, myLoader2;
 			var mouseX = 0;
 			var mouseY = 0;
 			// CAMERA & SCENE SETUP
@@ -48,20 +49,20 @@
 			/* https://threejs.org/examples/webgl_loader_obj_mtl.html */
 			var materialLoader = new THREE.MTLLoader(); // create material loader
 			//my test cube
-			materialLoader.setPath('objects/hollow-solid/');
-			materialLoader.load('hollowSolid.mtl', function(materials) {
-				materials.preload();
+			// materialLoader.setPath('objects/hollow-solid/');
+			// materialLoader.load('hollowSolid.mtl', function(materials) {
+			// 	materials.preload();
 
-				var loader = new THREE.OBJLoader(); // create object loader
-				loader.setMaterials(materials);
-				loader.setPath('objects/hollow-solid/');
-				loader.load('hollowSolid.obj', function(object) {
-					object.position.y = -3;
-					scene.add(object);
-					console.log("object load inner");
-				});
-				console.log("object load outer");
-			});
+			// 	var loader = new THREE.OBJLoader(); // create object loader
+			// 	loader.setMaterials(materials);
+			// 	loader.setPath('objects/hollow-solid/');
+			// 	loader.load('hollowSolid.obj', function(object) {
+			// 		object.position.y = -3;
+			// 		scene.add(object);
+			// 		console.log("object load inner");
+			// 	});
+			// 	console.log("object load outer");
+			// });
 
 			// a thingiverse model with mtl file
 			// var materialLoader = new THREE.MTLLoader(); // create material loader
@@ -78,6 +79,68 @@
 			// 	});
 			// 	console.log("object load outer");
 			// });
+
+
+
+
+
+
+			// var materialLoader = new THREE.MTLLoader(); // create material loader
+			// materialLoader.load(material, function(materials) {
+			// // 	materials.preload();
+			// 	var loader = new THREE.OBJLoader(); // create object loader
+			// 	loader.setMaterials(materials);
+			// 	loader.setPath('objects/Teapot_obj/');
+			// 	loader.load('cube.obj', function(object) {
+			// 		object.position.z = -100;
+			// 		scene.add(object);
+			// 		console.log("object load inner");
+			// 	});
+			// 	console.log("object load outer");
+			// });
+
+			// var myModel2 = new THREE.Mesh(
+			// 		myObject2, new THREE.MeshBasicMaterial({ color: "red", wireframe: false })
+			// 		);
+
+			// var myLoader2 = new THREE.OBJLoader();
+			// // myLoader2.setMaterials(myMaterial2);
+			// myLoader2.setPath('objects/Teapot_obj/');
+			// myLoader2.load('cube.obj', function(object) {
+			// 	object.position.z = -100;
+			// 	var myMaterial2 = new THREE.Mesh(
+			// 	object, new THREE.MeshBasicMaterial({ color: "red", wireframe: false });
+			// 	);
+			// 	scene.add(myMaterial2);
+			// });
+
+			//doesn't work because object created after loading is undefined
+			// myLoader2 = new THREE.OBJLoader();
+			// // myLoader2.setMaterials(myMaterial2);
+			// myLoader2.setPath('objects/Teapot_obj/');
+			// myLoader2.load('cube.obj', function(object) {
+			// 	object.position.z = -100;
+			// 	myMaterial2 = new THREE.MeshBasicMaterial({ color: "red", wireframe: false });
+			// 	myObject2 = new THREE.Mesh( object, myMaterial2 );
+			// 	scene.add(myObject2);
+			// });
+
+			// *** This is how I can add a material to an anonymous object that doesn't have one
+			myLoader2 = new THREE.OBJLoader();
+			// myLoader2.setMaterials(myMaterial2);
+			myLoader2.setPath('objects/Teapot_obj/');
+			myLoader2.load('cube.obj', function(object, materials) {
+				myMaterial2 = new THREE.MeshBasicMaterial({ color: "red" });
+				object.traverse( function(child) {
+					if( child instanceof THREE.Mesh) {
+						child.material = myMaterial2;
+					}
+
+				object.position.z = -100;
+				scene.add(object);
+				});
+			});
+
 			
 
 			// a thingiverse model with no mtl file
@@ -142,6 +205,11 @@
 				myModel.position.x = -2;
 				scene.add(myModel);
 				console.log("I should see my model now?");
+			}
+			function addModel2(myObject2) {
+				var myModel2 = new THREE.Mesh(
+					myObject2, new THREE.MeshBasicMaterial({ color: "red", wireframe: false })
+					);
 			}
 			function update() { // enable mouse controls
 				// controls.update();
