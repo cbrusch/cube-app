@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title>Troubleshooting</title>
+		<link rel="stylesheet" href="css/app.css">
+	</head>
+	<body>
+		<script src="js/three.min.js"></script>
+		<script src="js/utils/OBJLoader.js"></script>
+		<script src="js/utils/MTLLoader.js"></script>
+		<!-- <script src="js/utils/Detector.js"></script> -->
+		<script src="https://dl.dropboxusercontent.com/u/3587259/Code/Threejs/OrbitControls.js"></script>
+		<script>
+			// MAIN VARIABLES
+			var camera, scene, renderer
+			// CUSTOM VARIABLES
+			// camera variables
+			var focalLength = 75;
+			var aspectRatio = window.innerWidth / window.innerHeight;
+			var viewNear = 0.1;
+			var viewFar = 1000;
+			// object variables
+			var geometry, material, cube;
+			// var myObject = 'objects/test2/untitled.obj'; // point to object file
+			// var myTexture = 'objects/test2/untitled.mtl'; // point to object's texture
+			// controls variables
+			// var controls;
+			// var mouse = {x: 0, y: 0};
+			// CAMERA & SCENE SETUP
+			scene = new THREE.Scene(); // create scene
+			camera = new THREE.PerspectiveCamera( focalLength, aspectRatio, viewNear, viewFar ); // create camera
+			camera.position.z = 10; // position camera a little bit away from the object
+			// LIGHTING
+			var ambient = new THREE.AmbientLight( 0x444444 );
+			scene.add(ambient);
+			var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+			directionalLight.position.set( 0, 0, 1 ).normalize();
+			scene.add( directionalLight );			
+			// OBJECT
+			geometry = new THREE.BoxGeometry(1, 1, 1); // create 3d cube shape
+			material = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); // create a colored mesh material to cover shape
+			cube = new THREE.Mesh( geometry, material ); // combine shape and material to make a visible object
+			scene.add(cube); // add object to the scene
+			// MODEL
+			/* https://threejs.org/examples/webgl_loader_obj_mtl.html */
+			var materialLoader = new THREE.MTLLoader(); // create material loader
+			//my test cube
+			materialLoader.setPath('objects/test2/');
+			materialLoader.load('untitled.mtl', function(materials) {
+				materials.preload();
+
+				var loader = new THREE.OBJLoader(); // create object loader
+				loader.setMaterials(materials);
+				loader.setPath('objects/test2/');
+				loader.load('untitled.obj', function(object) {
+					object.position.y = -3;
+					scene.add(object);
+					console.log("object load inner");
+				});
+				console.log("object load outer");
+			});
+
+			// a thingiverse model with mtl file
+			// var materialLoader = new THREE.MTLLoader(); // create material loader
+			// materialLoader.setPath('objects/Kirby_Model/');
+			// materialLoader.load('Kirby.mtl', function(materials) {
+			// 	materials.preload();
+			// 	var loader = new THREE.OBJLoader(); // create object loader
+			// 	loader.setMaterials(materials);
+			// 	loader.setPath('objects/Kirby_Model/');
+			// 	loader.load('Kirby.obj', function(object) {
+			// 		object.position.z = -100;
+			// 		scene.add(object);
+			// 		console.log("object load inner");
+			// 	});
+			// 	console.log("object load outer");
+			// });
+			
+
+			// a thingiverse model with no mtl file
+			// var loader = new THREE.OBJLoader();
+			// loader.setPath('objects/Teapot_obj/');
+			// loader.load('cube.obj', function(object) {
+			// 	object.position.z = -30;
+			// 	scene.add(object);
+			// 	console.log("I should see a thingiverse object");
+			// });
+
+
+			// loader.load( myObject, function ( model ) { // load object and do stuff
+			// 	model.position.x = -5; // position model
+			// 	scene.add(model); // add model to the scene
+			// 	console.log("I think I loaded the model");
+			// } );
+			// loader.load( myObject, addModel );
+			// FINAL RENDERING
+			renderer = new THREE.WebGLRenderer(); // create renderer (either WebGL or Canvas)
+			renderer.setSize( window.innerWidth, window.innerHeight); // make the renderer the entire size of the window
+			document.body.appendChild( renderer.domElement ); // add renderer to the page (creates a canvas in the dom)
+			// MOUSE CONTROLS
+			////////////////////////// These controls aren't working right now
+			// controls = new THREE.OrbitControls(camera, renderer.domElement); 
+			// controls.enablePan = false;
+			// controls.enableRotate = false;
+			// EVENTS
+			// document.addEventListener( 'mousemove', onDocumentMouseMove, false ); // track mouse movement for controls
+			window.addEventListener( 'resize', onWindowResize, false );
+			// CALLS
+			// animate(); // display scene + camera to see object(s) + animation + process mouse controls
+			render();
+
+			// FUNCTIONS
+			function render() { // display
+				requestAnimationFrame(render); // request frame 60x per second to animate
+				// cube.rotation.x += 0.1; // animate spinning cube
+				// cube.rotation.y += 0.1;
+				// model.rotation.x += 0.1; // animate spinning model
+				// model.rotation.y += 0.1;
+				renderer.render(scene, camera); // render scene and camera in the browser
+			}
+			// function animate() { // animate
+			// 	// cube.rotation.x += 0.1;
+			// 	// cube.rotation.y += 0.1;
+			// 	// requestAnimationFrame(render);  
+			// 	render();
+			// 	update();
+			// }
+			function addModel(myObject) {
+				var myModel = new THREE.Mesh(
+						// myObject, new THREE.MeshBasicMaterial( {color: "red", wireframe: false} )
+						
+					);
+				myModel.map = THREE.TextureLoader(myTexture);
+				myModel.scale.set(-4, -4, -4);
+				// myModel.position.set(0, 0, 1);
+				myModel.position.x = -2;
+				scene.add(myModel);
+				console.log("I should see my model now?");
+			}
+			function update() { // enable mouse controls
+				// controls.update();
+			}
+			function onWindowResize() { // make responsive
+				camera.aspect = aspectRatio;
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+			// function onDocumentMouseMove(event) {
+			// 	mouse.x = ( event.clientX - window.innerWidth / 2 ) * 0.02 - 1;
+			// 	mouse.y = ( event.clientY - window.innerHeight / 2 ) * 0.02 + 1;
+			// 	console.log(mouse.x + ", " + mouse.y);
+			// }
+
+		</script>
+	</body>
+</html>
